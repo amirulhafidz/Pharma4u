@@ -37,7 +37,7 @@ class RatingController extends Controller
             )
             ->groupBy('r2.unit_id')
             ->orderByDesc(DB::raw('SUM(r1.rating * r2.rating) / (SQRT(SUM(r1.rating * r1.rating)) * SQRT(SUM(r2.rating * r2.rating)))'))
-            ->take(5) // Limit ratings
+            ->take(6) // Limit ratings
             ->get();
 
         return response()->json($ratings);
@@ -67,9 +67,14 @@ class RatingController extends Controller
                 DB::raw('SQRT(SUM(r2.rating * r2.rating)) as magnitude_compared')
             )
             ->groupBy('r2.unit_id')
+            // You might need to add a WHERE clause to restrict the recommendations to the same pharmacy
+            
             ->orderByDesc(DB::raw('SUM(r1.rating * r2.rating) / (SQRT(SUM(r1.rating * r1.rating)) * SQRT(SUM(r2.rating * r2.rating)))'))
-            ->take(5)
+            ->take(6)
             ->get();
+
+            // if ($recommendedUnits->isEmpty()) {
+            //   Log::info('No recommendations found for unit ID: ' . $unit->id);}
 
         // Fetch the recommended units by their IDs
         $recommendedUnitsList = Unit::whereIn('id', $recommendedUnits->pluck('recommended_unit'))->get();
@@ -143,9 +148,9 @@ class RatingController extends Controller
 
     public function StoreRating(Request $request)
     {
-        // $client = $request->client_id;
+        
         $unit = $request->unit_id;
-
+        $client = $request->client_id;
 
         $request->validate([
             'comment' => 'required'
@@ -153,7 +158,7 @@ class RatingController extends Controller
 
         Rating::insert([
             'user_id' => Auth::id(),
-            // 'client_id' => $client,
+            'client_id' =>$client,
             'unit_id' => $unit,
             'comment' => $request->comment,
             'rating' => $request->rating,

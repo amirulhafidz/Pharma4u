@@ -1,5 +1,8 @@
 <?php
 
+
+use App\Events\ChatEvent;
+use App\Events\ChatMessageSent;
 use App\Http\Controllers\Client\PharmacyController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -17,9 +20,11 @@ use App\Http\Controllers\Admin\ManageOrderController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Frontend\ReviewController;
 use App\Http\Controllers\Frontend\FilterController;
+use App\Http\Controllers\Frontend\ChatController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\RedirectController;
+use App\Http\Controllers\Admin\AdminChatController;
 
 
 
@@ -37,12 +42,39 @@ Route::get('/dashboard', function () {
     return view('frontend.dashboard.profile');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+
+
+
+
 Route::middleware('auth')->group(function () {
     Route::post('/profile/store', [UserController::class, 'ProfileStore'])->name('profile.store');
     Route::get('/user/logout', [UserController::class, 'UserLogout'])->name('user.logout');
     Route::get('/change/password', [UserController::class, 'ChangePassword'])->name('change.password');
     Route::post('/user/password/update', [UserController::class, 'UserPasswordUpdate'])->name('user.password.update');
-    
+
+    //message
+
+    // Route::get('/welcome2', function () {
+    //     return view('welcome2');
+    // });
+
+    Route::get('/message/section', function () {
+        return view('frontend.dashboard.message-section');
+    });
+
+    // Route::get('/message/section/test', function () {
+
+    //     \Log::info('Firing event: ChatMessageSent');
+
+    //     event(new ChatMessageSent('hello ze'));
+
+    //     return 'dispatched';
+    // });
+
+    Route::post('chat/send-message', action: [ChatController::class, 'SendMessage'])->name('chat.send-message');
+    Route::get('/chat/uget-conversation/{senderId}', action: [ChatController::class, 'GetConversation'])->name('chat.uget-conversation');
+
+
     //unutk get data wishlist for user
     Route::get('/all/wishlist', [HomeController::class, 'AllWishList'])->name('all.wishlist');
     Route::get('/remove/wishlist/{id}', [HomeController::class, 'RemoveWishList'])->name('remove.wishlist');
@@ -52,31 +84,40 @@ Route::middleware('auth')->group(function () {
         Route::get('/user/order/details/{id}', 'UserOrderDetails')->name('user.order.details');
         Route::get('/user/invoice/download/{id}', 'UserInvoiceDownload')->name('user.invoice.download');
 
-    
+
     });
 });
 
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 //REQUIRE LOGGING AND ADMIN
-Route::middleware('admin')->group(function(){
-    Route::get('/admin/dashboard', [AdminController::class,
-    'AdminDashboard'])->name('admin.dashboard');
-    Route::get('/admin/profile', [ AdminController::class,
-    'AdminProfile' ])->name('admin.profile');
+Route::middleware('admin')->group(function () {
+    Route::get('/admin/dashboard', [
+        AdminController::class,
+        'AdminDashboard'
+    ])->name('admin.dashboard');
+    Route::get('/admin/profile', [
+        AdminController::class,
+        'AdminProfile'
+    ])->name('admin.profile');
     Route::post('/admin/profile/store', [
-        AdminController::class, 'AdminProfileStore'])->name('admin.profile.store');
+        AdminController::class,
+        'AdminProfileStore'
+    ])->name('admin.profile.store');
     Route::get('/admin/change/password', [
-        AdminController::class,'AdminChangePassword' ])->name('admin.change.password');
+        AdminController::class,
+        'AdminChangePassword'
+    ])->name('admin.change.password');
     Route::post('/admin/password/update', [
         AdminController::class,
-        'AdminPasswordUpdate'])->name('admin.password.update');
+        'AdminPasswordUpdate'
+    ])->name('admin.password.update');
 });
 
 
-Route::get('/admin/login',[AdminController::class, 'AdminLogin'])->name('admin.login');
+Route::get('/admin/login', [AdminController::class, 'AdminLogin'])->name('admin.login');
 
 Route::post('/admin/login_submit', [AdminController::class, 'AdminLoginSubmit'])->name('admin.login_submit');
 
@@ -119,7 +160,7 @@ Route::middleware('client')->group(function () {
 
 Route::post('/client/register/submit', [ClientController::class, 'ClientRegisterSubmit'])->name('client.register.submit');
 
-Route::get('/client/login',[ClientController::class, 'ClientLogin'])->name('client.login');
+Route::get('/client/login', [ClientController::class, 'ClientLogin'])->name('client.login');
 
 Route::post('/client/login_submit', [ClientController::class, 'ClientLoginSubmit'])->name('client.login_submit');
 
@@ -127,7 +168,7 @@ Route::post('/client/login_submit', [ClientController::class, 'ClientLoginSubmit
 Route::get('/client/forget_password', [ClientController::class, 'ClientForgetPassword'])->name('client.forget_password');
 
 
-Route::get('/client/register',[ClientController::class, 'ClientRegister'])->name('client.register');
+Route::get('/client/register', [ClientController::class, 'ClientRegister'])->name('client.register');
 
 Route::post('/client/password_submit', [ClientController::class, 'ClientPasswordSubmit'])->name('client.password_submit');
 
@@ -140,7 +181,7 @@ Route::get('/client/logout', [ClientController::class, 'ClientLogout'])->name('c
 ///All Admin Category
 Route::middleware('admin')->group(function () {
 
-    Route::controller(CategoryController::class)->group(function(){
+    Route::controller(CategoryController::class)->group(function () {
         Route::get('/all/category', 'AllCategory')->name('all.category');
         Route::get('/add/category', 'AddCategory')->name('add.category');
         Route::post('/store/category', 'StoreCategory')->name('category.store');
@@ -232,7 +273,12 @@ Route::middleware('admin')->group(function () {
         Route::post('/update/permission', 'UpdatePermission')->name('permission.update');
         Route::get('/delete/permission/{id}', 'DeletePermission')->name('delete.permission');
 
+    });
 
+    Route::controller(AdminChatController::class)->group(function () {
+        Route::get('/chat/index', 'ChatIndex')->name('adchat.index');
+        Route::get('/chat/get-conversation/{senderId}', 'GetConversation')->name('chat.get-conversation');
+        Route::post('chat/adsend-message',  'SendMessage')->name('chat.adsend-message');
 
     });
 
@@ -242,7 +288,7 @@ Route::middleware('admin')->group(function () {
 
 Route::middleware(['status', 'client'])->group(function () {
 
-    Route::controller(PharmacyController::class)->group(function(){
+    Route::controller(PharmacyController::class)->group(function () {
 
         Route::get('/all/product', 'AllProduct')->name('all.product');
         Route::get('/add/product', 'AddProduct')->name('add.product');
@@ -250,11 +296,11 @@ Route::middleware(['status', 'client'])->group(function () {
         Route::get('/edit/product/{id}', 'EditProduct')->name('edit.product');
         Route::post('/update/product', 'UpdateProduct')->name('update.product');
         Route::get('/delete/product/{id}', 'DeleteProduct')->name('delete.product');
-        
+
 
     });
 
-    Route::controller(PharmacyController::class)->group(function(){
+    Route::controller(PharmacyController::class)->group(function () {
         Route::get('/all/unit', 'AllUnit')->name('all.unit');
         Route::get('/add/unit', 'AddUnit')->name('add.unit');
         Route::post('/store/unit', 'StoreUnit')->name('store.unit');
@@ -295,7 +341,7 @@ Route::middleware(['status', 'client'])->group(function () {
         Route::get('/client/confirm/order', 'ClientConfirmedOrder')->name('client.confirmed.order');
         Route::get('/client/processing/order', 'ClientProcessingOrder')->name('client.processing.order');
         Route::get('/client/delivered/order', action: 'ClientDeliveredOrder')->name('client.delivered.order');
-        Route::get('/all/client/orders/details/{id}','ClientOrderDetails',)->name('client.order_details');
+        Route::get('/all/client/orders/details/{id}', 'ClientOrderDetails', )->name('client.order_details');
 
     });
 
@@ -303,23 +349,6 @@ Route::middleware(['status', 'client'])->group(function () {
         Route::get('/client/pending_to_confirm/{id}', 'ClientPendingToConfirm')->name('client.pending_to_confirm');
         Route::get('/client/confirm_to_process/{id}', 'ClientConfirmToProcess')->name('client.confirm_to_process');
         Route::get('/client/process_to_delivered/{id}', 'ClientProcessToDelivered')->name('client.process_to_delivered');
-        
-    });
-
-    
-
-    Route::controller(ReportController::class)->group(function () {
-        Route::get('/admin/all/reports', 'AdminAllReports')->name('admin.all.reports');
-        Route::post('/admin/search/bydate', 'AdminSearchBydate')->name('admin.search.bydate');
-        Route::post('/admin/search/bymonth', 'AdminSearchBymonth')->name('admin.search.bymonth');
-        Route::post('/admin/search/byYear', 'AdminSearchByYear')->name('admin.search.byYear');
-
-    });
-
-    Route::controller(ReviewController::class)->group(function () {
-        Route::get('admin/pending/review', 'AdminPendingReview')->name('admin.pending.review');
-        Route::get('admin/approve/review', 'AdminApproveReview')->name('admin.approve.review');
-        Route::get('/reviewchangeStatus', 'ReviewChangeStatus');
 
     });
 
@@ -338,19 +367,20 @@ Route::middleware(['status', 'client'])->group(function () {
         Route::get('/reviewchangeStatus', 'ReviewChangeStatus');
 
     });
-    
+
 });
 // End Client Middleware
 
 
 //all user can
-Route::get('/changeStatus',[PharmacyController::class, 'ChangeStatus']);
+Route::get('/changeStatus', [PharmacyController::class, 'ChangeStatus']);
 
 
 Route::controller(HomeController::class)->group(function () {
     Route::get('/pharmacy/details/{id}', 'PharmacyDetails')->name('phm.details');
     Route::post('/add-wish-list/{id}', 'AddWishList');
     Route::get('/view/unit/{id}', 'ViewUnit')->name('view_unit');
+    Route::get('/all/list', 'AllList')->name('all_list');
 
 
 });
@@ -374,14 +404,19 @@ Route::controller(OrderController::class)->group(function () {
 
 Route::controller(ReviewController::class)->group(function () {
     Route::post('/store/review', 'StoreReview')->name('store.review');
-    
+
 });
 
 Route::controller(FilterController::class)->group(function () {
     Route::get('/list/pharmacy', 'ListPharmacy')->name('list.pharmacy');
     Route::get('/filter/unit', 'FilterUnit')->name('filter.units');
+    Route::get('/filter/select', 'FilterUnitSelect')->name('filter.select');
+    Route::get('/search/units', 'SearchUnits')->name('search.units');
 
 });
+
+Route::get('/view/all/{client_id}/{category_id}', [FilterController::class, 'ViewAll'])->name('view.all');
+
 
 Route::controller(RatingController::class)->group(function () {
     Route::get('/rating/{id}', 'Rating')->name('rating');

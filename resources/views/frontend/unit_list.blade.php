@@ -1,17 +1,14 @@
 @foreach ($filterUnits as $unit)
 
-
     <div class="col-md-4 col-sm-6 mb-4 pb-2">
         <div class="list-card bg-white h-100 rounded overflow-hidden position-relative shadow-sm">
             <div class="list-card-image">
-                <div class="star position-absolute"><span class="badge badge-success"><i class="icofont-star"></i> 3.1
-                        (300+)</span></div>
                 <div class="favourite-heart text-danger position-absolute"><a href="detail.html"><i
                             class="icofont-heart"></i></a></div>
-                <div class="member-plan position-absolute"><span class="badge badge-dark">Prooted</span></div>
-                <a href="{{route('phm.details', $unit->client_id)}}">
-                    <img src="{{asset($unit->image)}}" class="img-fluid item-img">
-                </a>
+                <div class="member-plan position-absolute"><span class="badge badge-dark">{{$unit->client->name}}</span></div>
+            <a href="{{ route('view_unit', $unit->id) }}">
+                <img src="{{asset($unit->image)}}" class="img-fluid item-img">
+            </a>
             </div>
             <div class="p-3 position-relative">
                 <div class="list-card-body">

@@ -9,9 +9,11 @@ use App\Models\Client;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
+use App\Models\Category;
 use App\Models\Unit;
 use App\Models\Wishlist;
 use App\Models\Review;
+use App\Models\Rating;
 
 use Illuminate\Support\Facades\DB;
 
@@ -27,6 +29,7 @@ class HomeController extends Controller
         $products = Product::where('client_id', $client->id)->get()->filter(function ($product) {
             return $product->units->isNotEmpty();
         });
+        $categories = Category::with('units')->get();
 
         $galleri = Gallery::where('client_id', $id)->get();
         $reviews = Review::where('client_id', $client->id)
@@ -47,29 +50,28 @@ class HomeController extends Controller
             return $totalReviews > 0 ? ($count / $totalReviews) * 100 : 0;
         }, $ratingCounts);
 
-        // Add the recommended units fetching logic here
-        $recommendedUnits = DB::table('ratings as r1')
+        // Fetch recommended units using the Rating function
+        $ratings = DB::table('ratings as r1')
             ->join('ratings as r2', function ($join) {
                 $join->on('r1.user_id', '=', 'r2.user_id')
                     ->whereColumn('r1.unit_id', '<>', 'r2.unit_id');
             })
-            ->where('r1.unit_id', $products->first()->unit_id) // Assuming you have a unit_id
-            ->select(
-                'r2.unit_id as recommended_unit',
-                DB::raw('SUM(r1.rating * r2.rating) as dot_product'),
-                DB::raw('SQRT(SUM(r1.rating * r1.rating)) as magnitude_target'),
-                DB::raw('SQRT(SUM(r2.rating * r2.rating)) as magnitude_compared')
-            )
+            ->where('r1.unit_id', $id)
+            ->where('r2.client_id', $client->id) // Specify the table and use $client->id
+            ->select('r2.unit_id as recommended_unit')
             ->groupBy('r2.unit_id')
-            ->orderByDesc(DB::raw('SUM(r1.rating * r2.rating) / (SQRT(SUM(r1.rating * r1.rating)) * SQRT(SUM(r2.rating * r2.rating)))'))
-            ->take(5)
+            ->take(3) // Limit to 5 recommendations
             ->get();
 
-        // Fetch the recommended units by their IDs
-        $recommendedUnitsList = Unit::whereIn('id', $recommendedUnits->pluck('recommended_unit'))->get();
+
+        // Fetch the actual unit details
+        $recommendedUnitIDs = $ratings->pluck('recommended_unit');
+        $recommendedUnits = Unit::whereIn('id', $recommendedUnitIDs)->get();
+
 
         return view('frontend.details_page', compact(
             'client',
+            'categories',
             'products',
             'galleri',
             'reviews',
@@ -77,9 +79,10 @@ class HomeController extends Controller
             'totalReviews',
             'ratingCounts',
             'ratingPercentages',
-            'recommendedUnitsList'
+            'recommendedUnits'
         ));
     }
+
 
 
     public function AddWishList(Request $request, $id){
@@ -126,30 +129,34 @@ class HomeController extends Controller
     public function ViewUnit($id){
         $client = Client::find($id);
         $unit = Unit::find($id);
-        $reviews = Review::where('client_id', $client->id)
+        $rating = Rating::where('unit_id', $unit->id)
             ->where('status', 1)->get();
-        $totalReviews = $reviews->count();
-        $ratingSum = $reviews->sum('rating');
+        $totalReviews = $rating->count();
+        $ratingSum = $rating->sum('rating');
         $averageRating = $totalReviews > 0 ? $ratingSum / $totalReviews : 0;
         $roundedAverageRating = round($averageRating, 1);
 
         $ratingCounts = [
-            '5' => $reviews->where('rating', 5)->count(),
-            '4' => $reviews->where('rating', 4)->count(),
-            '3' => $reviews->where('rating', 3)->count(),
-            '2' => $reviews->where('rating', 2)->count(),
-            '1' => $reviews->where('rating', 1)->count(),
+            '5' => $rating->where('rating', 5)->count(),
+            '4' => $rating->where('rating', 4)->count(),
+            '3' => $rating->where('rating', 3)->count(),
+            '2' => $rating->where('rating', 2)->count(),
+            '1' => $rating->where('rating', 1)->count(),
         ];
         $ratingPercentages = array_map(function ($count) use ($totalReviews) {
             return $totalReviews > 0 ? ($count / $totalReviews) * 100 : 0;
         }, $ratingCounts);
         return view(
             'frontend.unit_details_page', compact('unit','client',
-                'reviews',
+                'rating',
                 'roundedAverageRating',
                 'totalReviews',
                 'ratingCounts',
                 'ratingPercentages'));
+    }
+
+    public function AllList(){
+        return view('frontend.all_list_pharmacy');
     }
 
 

@@ -64,6 +64,7 @@ class ManageController extends Controller
                 'size' => $request->size,
                 'price' => $request->price,
                 'discount_price' => $request->discount_price,
+                'description' => $request->description,
                 'client_id' => $request->client_id,
                 'most_popular' => $request->most_popular,
                 'status' => 1,
@@ -115,6 +116,7 @@ class ManageController extends Controller
                 'size' => $request->size,
                 'price' => $request->price,
                 'discount_price' => $request->discount_price,
+                'description' => $request->description,
                 'client_id' => $request->client_id,
                 'most_popular' => $request->most_popular,
                 'created_at' => Carbon::now(),
@@ -140,6 +142,7 @@ class ManageController extends Controller
                 'size' => $request->size,
                 'price' => $request->price,
                 'discount_price' => $request->discount_price,
+                'description' => $request->description,
                 'most_popular' => $request->most_popular,
                 'created_at' => Carbon::now(),
             ]);

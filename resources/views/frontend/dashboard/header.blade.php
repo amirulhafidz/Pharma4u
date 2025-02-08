@@ -14,12 +14,12 @@
                         <a class="nav-link" href="{{route('index')}}">Home <span class="sr-only">(current)</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="offers.html"><i class="icofont-sale-discount"></i> Offers <span
-                                class="badge badge-danger">New</span></a>
+                        <a class="nav-link" href="{{route('all_list')}}"> Pharmacies <span
+                                class="badge badge-danger"></span></a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link" href="{{route('list.pharmacy')}}" role="button">
-                            Pharmacy
+                            Products
                         </a>
 
                     </li>
@@ -132,9 +132,14 @@ $clients = App\Models\Client::whereIn('id', array_keys
                             <a class="btn btn-success btn-block btn-lg" href="{{route('checkout')}}"> Checkout</a>
                         </div>
                         </div>
-                    
                     </li>
-                </ul>
+                    <li class="nav-item dropdown fp_chat_message">
+                        <a class="nav-link" href="{{route('list.pharmacy')}}" role="button">
+                            <i class="fab fa-rocketchat"></i> <span class="badge badge-success">{{count((array) session('cart')) }}</span></a>
+                        </a>
+                    </li>
+                    
             </div>
+            
         </div>
     </nav>

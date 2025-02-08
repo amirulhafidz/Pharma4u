@@ -42,4 +42,49 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
         ];
     }
+
+    // public function sentMessages()
+    // {
+    //     return $this->hasMany(Message::class, 'sender_id');
+    // }
+
+    // public function receivedMessages()
+    // {
+    //     return $this->hasMany(Message::class, 'receiver_id');
+    // }
+
+    // public function chats()
+    // {
+    //     return $this->hasMany(Chat::class, 'sender_id', 'id')
+    //         ->orWhere(function ($query) {
+    //             $query->where('receiver_id', $this->id);
+    //         });
+    // }
+
+    function chats()
+    {
+        return $this->hasMany(Chat::class, 'sender_id', 'id')
+            ->orWhere('receiver_id', $this->id);
+    }
+
+
+    // public function sentChats()
+    // {
+    //     return $this->hasMany(Chat::class, 'sender_id', 'id');
+    // }
+
+    // public function receivedChats()
+    // {
+    //     return $this->hasMany(Chat::class, 'receiver_id', 'id');
+    // }
+
+    // public function chats()
+    // {
+    //     return Chat::where('sender_id', $this->id)
+    //         ->orWhere('receiver_id', $this->id);
+    // }
+
+
+
+
 }

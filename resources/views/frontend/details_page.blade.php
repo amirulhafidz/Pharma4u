@@ -15,6 +15,7 @@ $coupon = App\Models\Coupon::where('client_id', $client->id)
     ->where('status', '1')->first();
 
 @endphp
+<title>{{$client->name}}</title>
 
 <section class="restaurant-detailed-banner">
     <div class="text-center">
@@ -78,9 +79,11 @@ $coupon = App\Models\Coupon::where('client_id', $client->id)
                             aria-selected="false">Pharmacy Info</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="pills-book-tab" data-toggle="pill" href="#pills-book" role="tab"
-                            aria-controls="pills-book" aria-selected="false">Book Appointment</a>
+                    <a class="nav-link"  href="{{ url('/message/section?senderId=1') }}" target="_blank" role="tab" aria-controls="orders" aria-selected="true"><i
+                            class="icofont-food-cart"></i> Chat with pharmacist</a>
                     </li>
+
+
                     <li class="nav-item">
                         <a class="nav-link" id="pills-reviews-tab" data-toggle="pill" href="#pills-reviews" role="tab"
                             aria-controls="pills-reviews" aria-selected="false">Ratings & Reviews</a>
@@ -104,16 +107,14 @@ $popular = App\Models\Unit::where('status', 1)->where('client_id', $client->id)-
     ->limit(5)->get();
                             @endphp
                             <div id="#menu" class="bg-white rounded shadow-sm p-4 mb-4 explore-outlets">
-                                <h5 class="mb-4">Offers</h5>
-                                <form class="explore-outlets-search mb-4 rounded overflow-hidden border">
+                                <h5 class="mb-4">Find Your Needs</h5>
+                                <form action="{{ route('search.units') }}" method="GET" class="explore-outlets-search mb-4 rounded overflow-hidden border">
                                     <div class="input-group">
-                                        <input type="text" placeholder="Search for dishes..."
-                                            class="form-control border-0">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-primary">
-                                                <i class="icofont-search"></i>
-                                            </button>
-                                        </div>
+                                        <input type="text" name="query" class="form-control form-control-sm border-white-btn" placeholder="Search for units..."
+                                            aria-label="Search" required>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="icofont-search"></i>
+                                        </button>
                                     </div>
                                 </form>
                                 <h6 class="mb-3">Offers <span class="badge badge-success"><i class="icofont-tags"></i>
@@ -128,7 +129,7 @@ $popular = App\Models\Unit::where('status', 1)->where('client_id', $client->id)-
                                                     <img class="img-fluid" src="{{ asset($populars->image) }}">
                                                     <h6>{{$populars->name}}</h6>
                                                     @if ($populars->discount_price == NULL)
-                                                        RM{{$populars->name->price}}
+                                                        RM{{$populars->price}}
                                                     @else
                                                         RM<del>{{$populars->price}}</del>
                                                         RM{{$populars->discount_price}}
@@ -145,84 +146,144 @@ $popular = App\Models\Unit::where('status', 1)->where('client_id', $client->id)-
 
                                 </div>
                             </div>
-                            <div class="row">
-                                <h5 class="mb-4 mt-3 col-md-12">Recommended</h5>
-                            
-                                @foreach($recommendedUnitsList as $recommendedUnit)
-                                    <div class="col-md-4 col-sm-6 mb-4">
-                                        <div class="list-card bg-white h-100 rounded overflow-hidden position-relative shadow-sm">
-                                            <div class="list-card-image">
-                                                <div class="star position-absolute">
-                                                    <span class="badge badge-success">
-                                                        <i class="icofont-star"></i> {{ $recommendedUnit->average_rating }}
-                                                        ({{ $recommendedUnit->reviews_count }}+)
-                                                    </span>
+                        <div class="row">
+                            <h5 class="mb-4 mt-3 col-md-12">Recommended</h5>
+                            @if ($recommendedUnits->isEmpty())
+                                <script>
+                                    console.log('recommendedUnits empty');
+                                </script>
+                            @endif
+                        
+                            @forelse ($recommendedUnits as $unit)
+                                @if ($recommendedUnits->isNotEmpty())
+                                    <script>
+                                        console.log("{{$unit->name}}");
+                                        console.log("{{$client->name}}");
+                                    </script>
+                                @endif
+                                <div class="col-md-4 col-sm-6 mb-4">
+                                    <div class="list-card bg-white h-100 rounded overflow-hidden position-relative shadow-sm">
+                                        <div class="list-card-image">
+                                            <a href="{{ route('viewrating', ['id' => $unit->id]) }}">
+                                                <img src="{{ asset($unit->image) }}" class="img-fluid item-img">
+                                            </a>
+                                        </div>
+                                        <div class="p-3 position-relative">
+                                            <div class="list-card-body">
+                                                <h6 class="mb-1">
+                                                    <a href="{{ route('viewrating', ['id' => $unit->id]) }}" class="text-black">
+                                                        {{ $unit->name }}
+                                                    </a>
+                                                </h6>
+
+                                                <p class="text-gray time mb-0">
+                                                <div class="item">
+                                                    <a class="btn btn-link btn-sm text-black" href="#">
+                                                        @if ($unit->discount_price == NULL)
+                                                            RM{{$unit->price}}({{ $unit->size ?? '' }})
+                                                        @else
+                                                            RM<del>{{$unit->price}}</del>({{ $unit->size ?? '' }})
+                                                            <a href="#">
+                                                                RM{{$unit->discount_price}}
+                                                            </a>
+                                                        @endif
+                                                    </a>
+                                                    <br>
                                                 </div>
-                                                <div class="favourite-heart text-danger position-absolute">
-                                                    <a href="#"><i class="icofont-heart"></i></a>
-                                                </div>
-                                                <div class="member-plan position-absolute">
-                                                    <span class="badge badge-dark">Promoted</span>
-                                                </div>
-                                                <a href="{{ route('frontend.unit_details_page', ['id' => $recommendedUnit->id]) }}">
-                                                    <img src="{{ asset('upload/unit_images/' . $recommendedUnit->image) }}" class="img-fluid item-img">
-                                                </a>
-                                            </div>
-                                            <div class="p-3 position-relative">
-                                                <div class="list-card-body">
-                                                    <h6 class="mb-1"><a href="{{ route('frontend.unit_details_page', ['id' => $recommendedUnit->id]) }}"
-                                                            class="text-black">{{ $recommendedUnit->name }}</a></h6>
-                                                    <p class="text-gray mb-2">{{ $recommendedUnit->description }}</p>
-                                                    <p class="text-gray time mb-0">
-                                                        <a class="btn btn-link btn-sm text-black" href="#">$ {{ $recommendedUnit->price }} <span
-                                                                class="badge badge-success">{{ $recommendedUnit->category }}</span></a>
-                                                        <span class="float-right">
-                                                            <a class="btn btn-outline-secondary btn-sm" href="">ADD</a>
-                                                        </span>
+                                                    <p>
+                                                        <!-- nak ada space -->
                                                     </p>
-                                                </div>
+                                                    <span class="float">
+                                                        <a class="btn btn-outline-secondary btn-sm" href="{{ route('add_to_cart', $unit->id) }}">ADD</a>
+                                                    </span>
+
+                                                    <span class="float-right mr-1">
+                                                        <a class="btn btn-outline-secondary btn-sm" href="{{ route('view_unit', $unit->id) }}">VIEW</a>
+                                                    </span>
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
-                                @endforeach
-                            </div>
+                                </div>
+                            @empty
+                                <p class="col-md-12">No recommendations available at the moment.</p>
+                            @endforelse
+                        </div>
 
-                            @foreach ($products as $product)
+                @foreach ($categories as $category)
+                    <!-- Check if the category has units belonging to the current pharmacy -->
+                    @if ($category->units->where('client_id', $client->id)->count() > 0)
+                        <div class="row">
+                            <!-- Category Title -->
+                            <h5 class="mb-4 mt-3 col-md-12">
+                                {{ $category->category_name }}
+                                <small class="h6 text-black-50">
+                                    ({{ $category->units->where('client_id', $client->id)->count() }})
+                                </small>
+                                <!-- View All Units Link -->
+                                    <a href="{{ route('view.all', ['client_id' => $client->id, 'category_id' => $category->id]) }}"
+                                        class="btn btn-link ml-3">View All Units</a>
 
+                                </h5>
 
-                                <div class="row">
-                                    <h5 class="mb-4 mt-3 col-md-12">{{ $product->product_name }}
-                                        <small class="h6 text-black-50">{{$product->units->count() }}</small>
-                                    </h5>
-                                    <div class="col-md-12">
-                                        <div class="bg-white rounded border shadow-sm mb-4">
-                                            @foreach ($product->units as $unit)
+                            </h5>
 
-                                                <div class="menu-list p-3 border-bottom">
+                            <!-- Loop Through Units Under This Category Belonging to the Pharmacy -->
+                            @foreach ($category->units->where('client_id', $client->id) as $unit)
+                                <div class="col-md-4 col-sm-6 mb-4">
+                                    <div class="list-card bg-white h-100 rounded overflow-hidden position-relative shadow-sm">
+                                        <div class="list-card-image">
+                                            <a href="{{route('viewrating', $unit->id)}}">
+                                                <img src="{{ asset($unit->image) }}" class="img-fluid item-img" alt="Unit image">
+                                            </a>
+                                        </div>
+                                        <div class="p-3 position-relative">
+                                            <div class="list-card-body">
+                                                <h6 class="mb-1">
+                                                    <a href="{{route('viewrating', $unit->id)}}"
+                                                        class="text-black">
+                                                        {{ $unit->name }}
+                                                    </a>
+                                                </h6>
 
-                                                <a class="btn btn-outline-secondary btn-sm  float-right " 
-                                                href="{{route('add_to_cart', $unit->id)}}">ADD</a>
+                                                <p class="text-gray time mb-0">
+                                                    <span class="badge badge-success">{{ $unit->rating }}</span>
 
-                                                    <a class="btn btn-outline-secondary btn-sm  float-right mr-2"
-                                                        href="{{route('viewrating', $unit->id, $client->id)}}">VIEW</a>
-
-                                                    <div class="media">
-                                                        <img class="mr-3 rounded-pill" src="{{ asset($unit->image) }}"
-                                                            alt="Generic placeholder image">
-                                                        <div class="media-body">
-                                                            <h6 class="mb-1">{{$unit->name }}</h6>
-                                                            <p class="text-gray mb-0">RM{{$unit->price }}
-                                                                ({{$unit->size ?? ''}})
-                                                            </p>
-
-                                                        </div>
+                                                    <div class="item">
+                                                        <a class="btn btn-link btn-sm text-black" href="#">
+                                                        @if ($unit->discount_price == NULL)
+                                                            RM{{$unit->price}}({{ $unit->size ?? '' }})
+                                                        @else
+                                                            RM<del>{{$unit->price}}</del>({{ $unit->size ?? '' }})
+                                                                <a href="#">
+                                                                    RM{{$unit->discount_price}}
+                                                                </a>
+                                                        @endif
+                                                        </a>
+                                                        <br>
                                                     </div>
-                                                </div>
-                                            @endforeach
+                                                </p>
+
+                                                <p>
+                                                    <!-- nak ada space -->
+                                                </p>
+                                                    <span class="float">
+                                                        <a class="btn btn-outline-secondary btn-sm" href="{{ route('add_to_cart', $unit->id) }}">ADD</a>
+                                                    </span>
+
+                                                    <span class="float-right mr-1">
+                                                        <a class="btn btn-outline-secondary btn-sm" href="{{ route('view_unit', $unit->id) }}">VIEW</a>
+                                                    </span>
+
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             @endforeach
+                        </div>
+                    @endif
+                @endforeach
+
 
 
                         </div>
@@ -293,48 +354,17 @@ $popular = App\Models\Unit::where('status', 1)->where('client_id', $client->id)-
                                 </div>
                             </div>
                         </div>
+                    <!-- Assuming you have $pharmacy passed to the view -->
+                    
                         <div class="tab-pane fade" id="pills-book" role="tabpanel" aria-labelledby="pills-book-tab">
-                            <div id="book-a-table"
-                                class="bg-white rounded shadow-sm p-4 mb-5 rating-review-select-page">
-                                <h5 class="mb-4">Book Appointment</h5>
-                                <form>
-                                    <div class="row">
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label>Full Name</label>
-                                                <input class="form-control" type="text" placeholder="Enter Full Name">
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label>Email Address</label>
-                                                <input class="form-control" type="text"
-                                                    placeholder="Enter Email address">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label>Mobile number</label>
-                                                <input class="form-control" type="text"
-                                                    placeholder="Enter Mobile number">
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label>Date And Time</label>
-                                                <input class="form-control" type="text"
-                                                    placeholder="Enter Date And Time">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group text-right">
-                                        <button class="btn btn-primary" type="button"> Submit </button>
-                                    </div>
-                                </form>
+                            <div id="book-a-table" class="bg-white rounded shadow-sm p-4 mb-5">
+                                <a class="nav-link" href="{{route('change.password')}}" role="tab" aria-controls="orders" aria-selected="true"><i
+                                        class="icofont-food-cart"></i> Change Password</a>
                             </div>
                         </div>
+                    
+
+
                         <div class="tab-pane fade" id="pills-reviews" role="tabpanel"
                             aria-labelledby="pills-reviews-tab">
                             <div id="ratings-and-reviews"
@@ -666,3 +696,5 @@ $coupon = App\Models\Coupon::where('client_id', $client->id)->where
 </section>
 
 @endsection
+
+

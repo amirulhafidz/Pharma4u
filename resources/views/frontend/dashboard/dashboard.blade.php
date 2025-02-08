@@ -8,7 +8,7 @@
     <meta name="description" content="Askbootstrap">
     <meta name="author" content="Askbootstrap">
     <meta name="csrf-token" content="{{csrf_token() }}">
-    <title>User Dashboard</title>
+    
     <!-- Favicon Icon -->
     <link rel="icon" type="image/png" href="{{ asset('frontend/img/favicon.png') }}">
     <!-- Bootstrap core CSS-->
@@ -26,7 +26,12 @@
     <!-- Custom styles for this template-->
     <link href="{{ asset('frontend/css/osahan.css') }}" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css">
+    <!-- <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script> -->
+
     <script src="https://js.stripe.com/v3/"></script>
+    
+
+    
 </head>
 
 <body>
@@ -42,6 +47,7 @@
 
     <!-- jQuery -->
     <script src="{{ asset('frontend/vendor/jquery/jquery-3.3.1.slim.min.js') }}"></script>
+
     <!-- Bootstrap core JavaScript-->
     <script src="{{ asset('frontend/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <!-- Select2 JavaScript-->
@@ -51,17 +57,18 @@
     <!-- Custom scripts for all pages-->
     <script src="{{ asset('frontend/js/custom.js') }}"></script>
 
-    <!-- <script>
-    $(document).ready(function () {
-        $('.owl-carousel').owlCarousel({
+    
 
-        });
-    });
-</script> -->
+
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.10.0/dist/echo.iife.js"></script>
+    
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+
 
 
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>

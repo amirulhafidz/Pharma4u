@@ -16,8 +16,10 @@
                     <p>No clients found.</p>
                 @endif
             </div>
+            <title>{{$unit->name}}</title>
+
             <div class="row">
-                <div class="d-flex align-items-center cart-info">
+                <div class="d-flex align-items-center cart-info h-100 rounded overflow-hidden position-relative shadow-sm">
                     <!-- Unit Image -->
                     <div class="image-container">
                         <img src="{{ asset($unit->image) }}" class="img-fluid" alt="Product Image">
@@ -26,25 +28,22 @@
                     <!-- Unit Details -->
                     <div class="unit-details ms-5 ml-2">
                         <h2>{{ $unit->name }}</h2>
-                        <p>Boost your immune system and promote healthy skin with our Vitamin C Tablets. Each tablet contains 1000mg of
-                        high-quality Vitamin C, essential for collagen production and overall health. Perfect for daily use to fight free
-                        radicals and support your body's natural defenses.</p>
+                        <p class="whitespace-pre-line">
+                            {!! nl2br(e($unit->description)) !!}
+                        </p>
                         <div class="product-info">
-                            <div class="ratings">
-                                <span class="badge bg-light text-dark">0 ratings</span>
-                            </div>
                             <div class="item">
-                                    <a href="#">
-                                        @if ($unit->discount_price == NULL)
-                                            RM{{$unit->name->price}}
-                                        @else
-                                            RM<del>{{$unit->price}}</del>
+                                <a class="btn btn-link btn-sm text-black" href="#">
+                                    @if ($unit->discount_price == NULL)
+                                        RM{{$unit->price}}({{ $unit->size ?? '' }})
+                                    @else
+                                        RM<del>{{$unit->price}}</del>({{ $unit->size ?? '' }})
+                                        <a href="#">
                                             RM{{$unit->discount_price}}
-                                        @endif
-                                        <br><span class="float-right">
-                                            <a class="btn btn-outline-secondary btn-sm" href="{{route('add_to_cart', $unit->id)}}">ADD</a>
-                                        </span>
-                                    </a>
+                                        </a>
+                                    @endif
+                                </a>
+                                <br>
                             </div>
                             <div class="stock-info">
                                 <!-- <span class="text-success">In Stock: 20</span> -->
@@ -52,6 +51,7 @@
                 
                             <!-- Add to Cart Section -->
                             <a class="btn btn-primary add-to-cart" href="{{ route('add_to_cart', $unit->id) }}">Add to Cart</a>
+                            <p></p>
                         </div>
                     </div>
                 </div>
@@ -81,7 +81,7 @@
                                         RM{{$details['price'] * $details['quantity']}}</p>
                                     <span class="count-number float-right">
 
-                                        <button class="btn btn-outline-secondary  btn-sm left dec" data-id="{{$id }}"> <i
+                                        <button class="btn btn-outline-secondary  btn-sm left dec" data-id="{{$id}}"> <i
                                                 class="icofont-minus"></i> </button>
 
                                         <input class="count-number-input" type="text" value="{{$details['quantity']}}"
@@ -203,19 +203,12 @@
                 <div class="product-info">
                     <div class="nav-main">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
-                            <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#description"
-                                    role="tab">Description</a></li>
                             <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#ratings"
                                     role="tab">Reviews</a></li>
                         </ul>
                     </div>
                     <div class="tab-content" id="myTabContent">
-                        <div class="tab-pane fade show active" id="description" role="tabpanel">
-                            <div class="tab-single">
-                                <p>// Add description here</p>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="ratings" role="tabpanel">
+                        <div class="tab-pane active" id="ratings" role="tabpanel">
                             <div class="tab-single review-panel">
                             <!-- ratings-->
                                 <div class="bg-white rounded shadow-sm p-4 mb-4 clearfix graph-star-rating">
@@ -322,6 +315,7 @@ $ratings = App\Models\Rating::where('unit_id', $unit->id)->where
                                         <form method="post" action="{{route('store.rating')}}">
                                             @csrf
                                             <input type="hidden" name="unit_id" value="{{$unit->id}}">
+                                            <input type="hidden" name="client_id" value="{{ $unit->client_id }}">
                                             <div class="mb-4">
                                                 <span class="star-rating">
                                                     <label for="rating-1">

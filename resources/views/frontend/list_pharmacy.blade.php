@@ -2,26 +2,26 @@
 @section('dashboard')
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
+
 <section class="breadcrumb-osahan pt-5 pb-5 bg-dark position-relative text-center">
     <h1 class="text-white">Offers Near You</h1>
     <h6 class="text-white-50">Best deals at your favourite pharmacies</h6>
 </section>
+
+
 <section class="section pt-5 pb-5 products-listing">
+    
     <div class="container">
         <div class="row d-none-m">
             <div class="col-md-12">
                 <div class="dropdown float-right">
-                    <a class="btn btn-outline-info dropdown-toggle btn-sm border-white-btn" href="#" role="button"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Sort by: <span class="text-theme">Distance</span> &nbsp;&nbsp;
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right shadow-sm border-0 ">
-                        <a class="dropdown-item" href="#">Distance</a>
-                        <a class="dropdown-item" href="#">No Of Offers</a>
-                        <a class="dropdown-item" href="#">Rating</a>
-                    </div>
+                <form action="{{ route('search.units') }}" method="GET" class="d-flex">
+                    <input type="text" name="query" class="form-control form-control-sm border-white-btn"
+                        placeholder="Search for units..." aria-label="Search" required>
+                    <button type="submit" class="btn btn-info btn-sm ml-2">Search</button>
+                </form>
                 </div>
-                <h4 class="font-weight-bold mt-0 mb-3">OFFERS <small class="h6 mb-0 ml-2">299 restaurants
+                <h4 class="font-weight-bold mt-0 mb-3">OFFERS <small class="h6 mb-0 ml-2">2 Pharmacies
                     </small>
                 </h4>
             </div>
@@ -108,8 +108,8 @@ $cities = App\Models\City::orderBy('id', 'desc')
                                     <div class="filters-card-body card-shop-filters">
                                         @foreach ($cities as $city)
                                         @php
-                                        $cityUnitCount = $units
-                                            ->where('city_id', $city->id)->count();
+    $cityUnitCount = $units
+        ->where('city_id', $city->id)->count();
                                         @endphp
                                         <div class="custom-control custom-checkbox">
                                             <input type="checkbox" class="custom-control-input filter-checkbox" 
@@ -136,7 +136,7 @@ $cities = App\Models\City::orderBy('id', 'desc')
                         <h5 class="m-0">Filter By</h5>
                     </div>
                     @php
-$products = App\Models\Product::orderBy('id', 'desc')
+$clients = App\Models\Client::orderBy('id', 'desc')
     ->limit(10)
     ->get();
                     @endphp
@@ -148,7 +148,7 @@ $products = App\Models\Product::orderBy('id', 'desc')
                                     <h6 class="mb-0">
                                         <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseOneproduct"
                                             aria-expanded="true" aria-controls="collapseOneproduct">
-                                            Products <i class="icofont-arrow-down float-right"></i>
+                                            Pharmacies <i class="icofont-arrow-down float-right"></i>
                                         </a>
                                     </h6>
                                 </div>
@@ -157,18 +157,18 @@ $products = App\Models\Product::orderBy('id', 'desc')
                                     data-parent="#accordion">
 
                                     <div class="filters-card-body card-shop-filters">
-                                        @foreach ($products as $product)
+                                        @foreach ($clients as $client)
                                             @php
-                                            $productUnitCount = $units->where(
-                                                'product_id',
-                                                $product->id
-                                            )->count();
+    $clientUnitCount = $units->where(
+        'client_id',
+        $client->id
+    )->count();
                                             @endphp
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox" class="custom-control-input filter-checkbox" 
-                                                id="product-{{$product->id}}" data-type="product" data-id="{{$product->id}}">
-                                                <label class="custom-control-label" for="product-{{$product->id}}">{{$product->product_name}}<small
-                                                        class="text-black-50">({{$productUnitCount}})</small>
+                                                id="client-{{$client->id}}" data-type="client" data-id="{{$client->id}}">
+                                                <label class="custom-control-label" for="client-{{$client->id}}">{{$client->name}}<small
+                                                        class="text-black-50">({{$clientUnitCount}})</small>
                                                 </label>
                                             </div>
 
@@ -186,44 +186,77 @@ $products = App\Models\Product::orderBy('id', 'desc')
                 <!-- end div  -->
 
             </div>
+@php
+use Carbon\Carbon;
+@endphp
+
             <div class="col-md-9">
                 
                 <div class="row" id="unit-list">
 
-                @foreach ($units as $unit)
+                    @foreach ($units as $unit)
+                                                                                                                                                        @php
+                        $coupon = App\Models\Coupon::where('client_id', $unit->client_id)->where
+                        ('validity', '>=', Carbon::now()->format('Y-m-d'))->latest()->first();
+                                                                                                                                                        @endphp
 
+                                                                                                                                                        @php
+                        $ratingcount = App\Models\Rating::where('unit_id', $unit->id)
+                            ->where('status', 1)
+                            ->latest()
+                            ->get();
+                        $average = App\Models\Rating::where('unit_id', $unit->id)
+                            ->where('status', 1)->avg('rating');
+                                                            @endphp
 
-                    <div class="col-md-4 col-sm-6 mb-4 pb-2">
-                        <div class="list-card bg-white h-100 rounded overflow-hidden position-relative shadow-sm">
-                            <div class="list-card-image">
-                                <div class="star position-absolute"><span class="badge badge-success"><i
-                                            class="icofont-star"></i> 3.1 (300+)</span></div>
-                                <div class="favourite-heart text-danger position-absolute"><a href="detail.html"><i
-                                            class="icofont-heart"></i></a></div>
-                                <div class="member-plan position-absolute"><span
-                                        class="badge badge-dark">Promoted</span></div>
-                                <a href="{{route('phm.details', $unit->client_id)}}">
-                                    <img src="{{asset($unit->image)}}" class="img-fluid item-img">
-                                </a>
-                            </div>
-                            <div class="p-3 position-relative">
-                                <div class="list-card-body">
-                                    <h6 class="mb-1"><a href="{{route('phm.details', $unit->client_id)}}" class="text-black">{{$unit->name}}</a></h6>
+                                                <div class="col-md-4 col-sm-6 mb-4 pb-2">
+                                                    <div class="list-card bg-white h-100 rounded overflow-hidden position-relative shadow-sm">
+                                                        <div class="list-card-image">
+                                                            <div class="star position-absolute"><span class="badge badge-success"><i
+                                                                        class="icofont-star"></i>{{number_format($average, 1)}}
+                                                                    ({{count($ratingcount)}})+</span></div>
+                                                            <div class="member-plan position-absolute">
+                                                                <span class="badge badge-dark">{{$unit->client->name}}</span>
+                                                            </div>
 
-                                    <p class="text-gray mb-3 time"><span
-                                            class="bg-light text-dark rounded-sm pl-2 pb-1 pt-1 pr-2"><i
-                                                class="icofont-wall-clock"></i> 20–25 min</span> <span
-                                            class="float-right text-black-50"> RM{{$unit->price}}</span></p>
-                                </div>
-                                <div class="list-card-badge">
-                                    <span class="badge badge-success">OFFER</span> <small>65% off | Use Coupon
-                                        OSAHAN50</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                                            <a href="{{ route('view_unit', $unit->id) }}">
+                                                                <img src="{{asset($unit->image)}}" class="img-fluid item-img">
+                                                            </a>
+                                                        </div>
+                                                        <div class="p-3 position-relative">
+                                                            <span class="float-right">
+                                                                <a class="btn btn-outline-secondary btn-sm" href="{{ route('view_unit', $unit->id) }}">VIEW</a>
+                                                            </span>
+                                                            <div class="list-card-body">
+                                                                <h6 class="mb-1"><a href="{{route('view_unit', $unit->client_id)}}" class="text-black">{{$unit->name}}</a></h6>
 
-                @endforeach
+                                                            <p class="text-gray mb-3 time">
+                                                            <div class="item">
+                                                                @if ($unit->discount_price == NULL)
+                                                                    RM{{$unit->price}}
+                                                                @else
+                                                                    <a href="#">
+                                                                        RM<del>{{$unit->price}}</del>
+                                                                        RM{{$unit->discount_price}}
+                                                                    </a>
+                                                                @endif
+                                                                <br>
+                                                            </div>
+                                                            </p>
+                                                            </div>
+                                                            <div class="list-card-badge">
+                                                                <span class="badge badge-success">OFFER</span> @if ($coupon == NULL)
+                                                                    <p class="mb-0">No Coupon is available</p>
+                                                                @else
+                                                                    <p class="mb-0">{{$coupon->discount }}% | Use coupon <span
+                                                                            class="text-danger font-weight-bold">{{$coupon->coupon_name}}</span></p>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -238,7 +271,7 @@ $products = App\Models\Product::orderBy('id', 'desc')
             var filters = {
                 categories:[],
                 cities: [],
-                products: [],
+                clients: [],
             };
             // console.log(filters);
             $('.filter-checkbox:checked').each(function(){

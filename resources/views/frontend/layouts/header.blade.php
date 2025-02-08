@@ -11,14 +11,13 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="offers.html"><i class="icofont-sale-discount"></i> Offers <span
-                            class="badge badge-warning">New</span></a>
-                </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{route('all_list')}}"> Pharmacies <span class="badge badge-danger"></span></a>
+            </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link" href="{{route('list.pharmacy')}}" role="button" aria-haspopup="true"
                         aria-expanded="false">
-                        Pharmacies
+                        Products
                     </a>
                 </li>
 
@@ -63,16 +62,16 @@
                     </li>
                 @endauth
                 @php
-                    $total = 0;
-                    $cart = session()->get('cart', []);
-                    $groupedCart = [];
+$total = 0;
+$cart = session()->get('cart', []);
+$groupedCart = [];
 
-                    foreach ($cart as $item) {
-                        $groupedCart[$item['client_id']][] = $item;
-                    }
+foreach ($cart as $item) {
+    $groupedCart[$item['client_id']][] = $item;
+}
 
-                    $clients = App\Models\Client::whereIn('id', array_keys
-                    ($groupedCart))->get()->keyBy('id');
+$clients = App\Models\Client::whereIn('id', array_keys
+($groupedCart))->get()->keyBy('id');
                 @endphp
                 
                 
@@ -90,7 +89,7 @@
                     @foreach ($groupedCart as $clientId => $items)
                                     @if (isset($clients[$clientId]))
                                                     @php
-                                                        $client = $clients[$clientId];
+        $client = $clients[$clientId];
                                                     @endphp
 
 
@@ -109,7 +108,7 @@
                         @if (session('cart'))
                                             @foreach (session('cart') as $id => $details)
                                                                 @php
-                                                                    $total += $details['price'] * $details['quantity']
+        $total += $details['price'] * $details['quantity']
                                                                 @endphp
 
                                                                 <p class="mb-2"><i class="icofont-ui-press text-danger food-item">
@@ -123,7 +122,7 @@
                             <span class="float-right text-dark">
                                 @if (Session::has('coupon'))
                                                                 RM{{Session()->get('coupon')
-                                    ['discount_amount'] }}
+    ['discount_amount'] }}
                                 @else
                                     RM{{$total}}
                                 @endif

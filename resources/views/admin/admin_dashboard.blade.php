@@ -30,9 +30,16 @@
     <!-- App Css-->
     <link href="{{ asset('backend/assets/css/app.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css">
+    <!-- <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script> -->
+
+    <script>
+        var loggedInUserId = "{{ Auth::guard('admin')->id() }}";
+    </script>
+    
 
 
 </head>
+
 
 <body>
 

@@ -110,6 +110,15 @@
 
                                 <div class="col-xl-6 col-md-6">
                                     <div class="form-group mb-3">
+                                        <label for="example-text-input" class="form-label">Description</label>
+                                        <textarea type="text"  name="description" id="example-text-input" class="form-control" rows="5">
+                                        {{$unit->description}}
+                                    </textarea>
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-6 col-md-6">
+                                    <div class="form-group mb-3">
                                         <label for="example-text-input" class="form-label"> Unit Image</label>
                                         <input class="form-control" type="file" name="image" id="image">
                                     </div>

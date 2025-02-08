@@ -10,8 +10,10 @@
         "haruncpi/laravel-id-generator": "^1.1",
         "intervention/image": "^3.9",
         "laravel/framework": "^11.9",
+        "laravel/reverb": "^1.0",
         "laravel/tinker": "^2.9",
-        "spatie/laravel-permission": "^6.10",
+        "pusher/pusher-php-server": "^7.2",
+        "spatie/laravel-permission": "*",
         "stripe/stripe-php": "^16.3"
     },
     "require-dev": {

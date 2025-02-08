@@ -47,11 +47,7 @@
                                                     ({{count($reviewcount)}})+</span></div>
                                         <div class="favourite-heart text-danger position-absolute"><a aria-label="Add to wishlist"
                                                 onclick="addWishList({{$client->id}})"><i class="icofont-heart"></i></a></div>
-                                        @if ($coupon)
-                                            <div class="member-plan position-absolute"><span class="badge badge-dark">Promoted</span>
-                                            </div>
-                                        @else
-                                        @endif
+                                        
 
                                         <a href="{{route('phm.details', $client->id)}}">
                                             <img src="{{ asset('upload/client_images/' . $client->photo) }}"
@@ -62,10 +58,10 @@
                                         <div class="list-card-body">
                                             <h6 class="mb-1"><a href="{{route('phm.details', $client->id)}}"
                                                     class="text-black">{{$client->name}}</a></h6>
-                                            <p class="text-gray mb-3">{{$productNameString}}</p>
+                                            <p class="text-gray mb-3">Click to view more...</p>
                                             <p class="text-gray mb-3 time"><span
                                                     class="bg-light text-dark rounded-sm pl-2 pb-1 pt-1 pr-2"><i
-                                                        class="icofont-wall-clock"></i> 20–25 min</span> </p>
+                                                        class="icofont-wall-clock"></i> 10 A.M- 5.00 P.M.
                                         </div>
                                         <div class="list-card-badge">
                                             @if ($coupon)

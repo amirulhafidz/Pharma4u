@@ -187,6 +187,12 @@
         </ul>
     </li>
 
+    <li>
+        <a href="{{route('adchat.index')}}">
+            <i data-feather="grid"></i>
+            <span data-key="t-calendar">Messages</span>
+        </a>
+    </li>
     </ul>
 
     

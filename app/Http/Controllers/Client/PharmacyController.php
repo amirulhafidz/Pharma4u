@@ -135,6 +135,7 @@ class PharmacyController extends Controller
     public function AllUnit()
     {
         $id = Auth::guard('client')->id();
+        $category = Category::latest()->get();
         $unit = Unit::where('client_id',$id)->orderBy('id','desc')->get();
         return view('client.backend.unit.all_unit', compact('unit'));
     }
@@ -178,6 +179,7 @@ class PharmacyController extends Controller
                 'price' => $request->price,
                 'discount_price' => $request->discount_price,
                 'client_id' => Auth::guard('client')->id(),
+                'description' => $request->description,
                 'most_popular' => $request->most_popular,
                 'status' =>1,
                 'created_at'=>Carbon::now(),
@@ -229,6 +231,7 @@ class PharmacyController extends Controller
                 'size' => $request->size,
                 'price' => $request->price,
                 'discount_price' => $request->discount_price,
+                'description' => $request->description,
                 'most_popular' => $request->most_popular,
                 'created_at' => Carbon::now(),
                 'image' => $save_url,
@@ -252,6 +255,7 @@ class PharmacyController extends Controller
                 'size' => $request->size,
                 'price' => $request->price,
                 'discount_price' => $request->discount_price,
+                'description' => $request->description,
                 'most_popular' => $request->most_popular,
                 'created_at' => Carbon::now(),
             ]);

@@ -21,5 +21,10 @@ class Rating extends Model
     {
         return $this->belongsTo(Unit::class, 'unit_id', 'id');
     }
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class, 'client_id', 'id');
+    }
     
 }
