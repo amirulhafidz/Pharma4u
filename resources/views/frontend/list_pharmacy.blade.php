@@ -21,7 +21,7 @@
                     <button type="submit" class="btn btn-info btn-sm ml-2">Search</button>
                 </form>
                 </div>
-                <h4 class="font-weight-bold mt-0 mb-3">OFFERS <small class="h6 mb-0 ml-2">2 Pharmacies
+                <h4 class="font-weight-bold mt-0 mb-3">OFFERS <small class="h6 mb-0 ml-2">
                     </small>
                 </h4>
             </div>

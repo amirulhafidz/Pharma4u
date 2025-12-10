@@ -67,7 +67,6 @@ class RatingController extends Controller
                 DB::raw('SQRT(SUM(r2.rating * r2.rating)) as magnitude_compared')
             )
             ->groupBy('r2.unit_id')
-            // You might need to add a WHERE clause to restrict the recommendations to the same pharmacy
             
             ->orderByDesc(DB::raw('SUM(r1.rating * r2.rating) / (SQRT(SUM(r1.rating * r1.rating)) * SQRT(SUM(r2.rating * r2.rating)))'))
             ->take(6)

@@ -21,6 +21,7 @@ class ClientController extends Controller
 
     public function ClientLoginSubmit(Request $request)
     {
+        
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
